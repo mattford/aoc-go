@@ -35,7 +35,7 @@ var benchCmd = &cobra.Command{
 		}
 
 		cmdArgs := fmt.Sprintf("go test -benchmem -run=^$ -bench %s aocgen/pkg/year%d", benchArgRegex, year)
-		c := exec.Command("bash", "-c", cmdArgs)
+		c := exec.Command("cmd", "/K", cmdArgs)
 		out, err := c.Output()
 		if err != nil {
 			logrus.Error(err)
