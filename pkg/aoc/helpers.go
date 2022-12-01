@@ -47,6 +47,7 @@ func readFile(fileName string) []string {
 		logrus.Fatal(err)
 	}
 
-	lines := strings.Split(string(b), "\n")
+	cleaned := strings.Replace(string(b), "\r\n", "\n", -1)
+	lines := strings.Split(cleaned, "\n")
 	return lines
 }
