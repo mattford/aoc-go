@@ -4,7 +4,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"sort"
 	"strconv"
-	"strings"
 )
 
 type Day01 struct{}
@@ -30,12 +29,11 @@ func getElves(lines []string) []int {
 	elves := make([]int, 0)
 	var calorieCount int
 	for _, line := range lines {
-		if line == "\r" {
+		if line == "" {
 			elves = append(elves, calorieCount)
 			calorieCount = 0
 		} else {
-
-			count, err := strconv.Atoi(strings.Replace(line, "\r", "", 1))
+			count, err := strconv.Atoi(line)
 			if err != nil {
 				logrus.Error(err)
 				continue
