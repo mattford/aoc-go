@@ -1,8 +1,8 @@
 package year2020
 
 import (
+	"aocgen/pkg/common"
 	"sort"
-	"strconv"
 )
 
 type Day09 struct{}
@@ -10,11 +10,11 @@ type Day09 struct{}
 var preamble int = 25
 
 func (p Day09) PartA(lines []string) any {
-	return findInvalid(getInts(lines))
+	return findInvalid(common.GetInts(lines))
 }
 
 func (p Day09) PartB(lines []string) any {
-	numbers := getInts(lines)
+	numbers := common.GetInts(lines)
 	invalid := findInvalid(numbers)
 	for i := range numbers {
 		check, score := check(numbers, i, invalid)
@@ -66,16 +66,4 @@ func valid(prev []int, current int) bool {
 		}
 	}
 	return false
-}
-
-func getInts(lines []string) []int {
-	ints := make([]int, len(lines))
-	for i, str := range lines {
-		n, err := strconv.Atoi(str)
-		if err != nil {
-			panic(err)
-		}
-		ints[i] = n
-	}
-	return ints
 }
