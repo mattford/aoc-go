@@ -1,6 +1,7 @@
 package year2020
 
 import (
+	"aocgen/pkg/common"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ func (p Day07) PartA(lines []string) any {
 	bags := getBags(lines)
 	myBag := "shiny gold bag"
 	canHold := getCanHold(bags, myBag)
-	return len(unique(canHold))
+	return len(common.Unique(canHold))
 }
 
 func (p Day07) PartB(lines []string) any {
@@ -29,25 +30,6 @@ func countBags(bags map[string]Bag, myBag string) int {
 		count += cnt * countBags(bags, bag)
 	}
 	return count
-}
-
-func contains(a []string, y string) bool {
-	for _, x := range a {
-		if x == y {
-			return true
-		}
-	}
-	return false
-}
-
-func unique(a []string) []string {
-	newA := make([]string, 0)
-	for _, y := range a {
-		if !contains(newA, y) {
-			newA = append(newA, y)
-		}
-	}
-	return newA
 }
 
 func getCanHold(bags map[string]Bag, myBag string) []string {

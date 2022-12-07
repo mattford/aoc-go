@@ -36,6 +36,16 @@ func Without(ints []int, target int) []int {
 	return newInts
 }
 
+func Unique[T comparable](a []T) []T {
+	newA := make([]T, 0)
+	for _, y := range a {
+		if !Contains(newA, y) {
+			newA = append(newA, y)
+		}
+	}
+	return newA
+}
+
 func Contains[T comparable](haystack []T, needle T) bool {
 	for _, v := range haystack {
 		if v == needle {

@@ -228,3 +228,20 @@ func Benchmark2020Day13(b *testing.B) {
 		}
 	})
 }
+func Benchmark2020Day14(b *testing.B) {
+	Init()
+	input := aoc.TestInput(2020, 14)
+	p := aoc.NewPuzzle(2020, 14)
+	b.Run("PartA", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			p.PartA(input)
+		}
+	})
+	b.Run("PartB", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			p.PartB(input)
+		}
+	})
+}
