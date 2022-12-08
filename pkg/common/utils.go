@@ -55,6 +55,14 @@ func Contains[T comparable](haystack []T, needle T) bool {
 	return false
 }
 
+func Column(haystack [][]int, idx int) []int {
+	out := make([]int, 0, len(haystack))
+	for _, v := range haystack {
+		out = append(out, v[idx])
+	}
+	return out
+}
+
 // greatest common divisor (GCD) via Euclidean algorithm
 func GCD(a, b int) int {
 	for b != 0 {
