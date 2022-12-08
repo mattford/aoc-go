@@ -46,6 +46,14 @@ func Unique[T comparable](a []T) []T {
 	return newA
 }
 
+func Keys[T comparable, V any](haystack map[T]V) []T {
+	keys := make([]T, 0, len(haystack))
+	for k := range haystack {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 func Contains[T comparable](haystack []T, needle T) bool {
 	for _, v := range haystack {
 		if v == needle {
@@ -53,6 +61,16 @@ func Contains[T comparable](haystack []T, needle T) bool {
 		}
 	}
 	return false
+}
+
+func Remove[T comparable](haystack []T, needle T) []T {
+	newArr := make([]T, 0)
+	for _, v := range haystack {
+		if v != needle {
+			newArr = append(newArr, v)
+		}
+	}
+	return newArr
 }
 
 func Column(haystack [][]int, idx int) []int {
