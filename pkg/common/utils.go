@@ -101,3 +101,13 @@ func LCM(a, b int, integers ...int) int {
 
 	return result
 }
+
+func Bound(a int, low int, high int) int {
+	if a > high {
+		return high
+	}
+	if a < low {
+		return low
+	}
+	return a
+}
