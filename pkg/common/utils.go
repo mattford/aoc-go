@@ -2,12 +2,13 @@ package common
 
 import (
 	"strconv"
+	"strings"
 )
 
 func GetInts(lines []string) []int {
 	ints := make([]int, len(lines))
 	for i, str := range lines {
-		n, err := strconv.Atoi(str)
+		n, err := strconv.Atoi(strings.Trim(str, " "))
 		if err != nil {
 			panic(err)
 		}
@@ -89,6 +90,14 @@ func GCD(a, b int) int {
 		a = t
 	}
 	return a
+}
+
+func Sum(ints []int) int {
+	total := 0
+	for _, i := range ints {
+		total += i
+	}
+	return total
 }
 
 // find Least Common Multiple (LCM) via GCD
