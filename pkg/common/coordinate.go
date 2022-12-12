@@ -1,5 +1,8 @@
 package common
 
+type coordinate interface {
+}
+
 type Coordinate2 struct {
 	Y int
 	X int
