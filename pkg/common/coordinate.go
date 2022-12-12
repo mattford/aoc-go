@@ -5,17 +5,6 @@ type Coordinate2 struct {
 	X int
 }
 
-var Coordinate2Neighbours9 = []Coordinate2{
-	{-1, -1},
-	{-1, 0},
-	{-1, 1},
-	{0, -1},
-	{0, 1},
-	{1, -1},
-	{1, 0},
-	{1, 1},
-}
-
 var (
 	East      = Coordinate2{X: 1, Y: 0}
 	South     = Coordinate2{X: 0, Y: 1}
@@ -26,6 +15,24 @@ var (
 	SouthEast = Coordinate2{X: 1, Y: 1}
 	SouthWest = Coordinate2{X: -1, Y: 1}
 )
+
+var Coordinate2Neighbours9 = []Coordinate2{
+	North,
+	East,
+	South,
+	West,
+	NorthEast,
+	NorthWest,
+	SouthEast,
+	SouthWest,
+}
+
+var Coordinate2Neighbours4 = []Coordinate2{
+	North,
+	East,
+	South,
+	West,
+}
 
 func IsAdjacent2(coord1 Coordinate2, coord2 Coordinate2) bool {
 	for _, neighbour := range Coordinate2Neighbours9 {

@@ -2,9 +2,9 @@ package year2022
 
 import (
 	"aocgen/pkg/common"
-	"fmt"
 	"math"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -22,25 +22,41 @@ type monkey struct {
 
 func (p Day11) PartA(lines []string) any {
 	monkeys := parseInput11(lines)
-	for i := 0; i < 5; i++ {
-		monkeys = doRound(monkeys)
-		fmt.Println(monkeys)
+	for i := 0; i < 20; i++ {
+		monkeys = doRound(monkeys, false, 0)
 	}
-	fmt.Println(monkeys)
-	return "implement_me"
+	sort.Slice(monkeys, func(i, j int) bool {
+		a := monkeys[i]
+		b := monkeys[j]
+		return a.inspections > b.inspections
+	})
+	return monkeys[0].inspections * monkeys[1].inspections
 }
 
 func (p Day11) PartB(lines []string) any {
-	return "implement_me"
+	monkeys := parseInput11(lines)
+	mod := getModulo(monkeys)
+	for i := 0; i < 10000; i++ {
+		monkeys = doRound(monkeys, true, mod)
+	}
+	sort.Slice(monkeys, func(i, j int) bool {
+		a := monkeys[i]
+		b := monkeys[j]
+		return a.inspections > b.inspections
+	})
+	return monkeys[0].inspections * monkeys[1].inspections
 }
 
-func doRound(monkeys map[int]monkey) map[int]monkey {
+func doRound(monkeys []monkey, extremelyWorried bool, mod int) []monkey {
 	for idx, monk := range monkeys {
-
 		for _, item := range monk.items {
 			monk.inspections++
 			item = doOp(monk, item)
-			item = int(math.Floor(float64(item / 3)))
+			if !extremelyWorried {
+				item = int(math.Floor(float64(item / 3)))
+			} else {
+				item = item % mod
+			}
 			if item%monk.test == 0 {
 				otherMonkey := monkeys[monk.ifTrue]
 				otherMonkey.items = append(otherMonkey.items, item)
@@ -55,6 +71,14 @@ func doRound(monkeys map[int]monkey) map[int]monkey {
 		monkeys[idx] = monk
 	}
 	return monkeys
+}
+
+func getModulo(monkeys []monkey) int {
+	total := 1
+	for _, m := range monkeys {
+		total *= m.test
+	}
+	return total
 }
 
 func doOp(monk monkey, item int) int {
@@ -77,14 +101,12 @@ func doOp(monk monkey, item int) int {
 	return item
 }
 
-func parseInput11(lines []string) map[int]monkey {
+func parseInput11(lines []string) []monkey {
 	thisMonkey := monkey{}
-	monkeys := make(map[int]monkey)
-	monkeyIdx := 0
+	monkeys := make([]monkey, 0)
 	for _, line := range lines {
 		if line == "" {
-			monkeys[monkeyIdx] = thisMonkey
-			monkeyIdx++
+			monkeys = append(monkeys, thisMonkey)
 			thisMonkey = monkey{}
 		}
 		parts := strings.Split(strings.Trim(line, " "), ":")
@@ -107,6 +129,6 @@ func parseInput11(lines []string) map[int]monkey {
 			thisMonkey.ifFalse = x
 		}
 	}
-	monkeys[monkeyIdx] = thisMonkey
+	monkeys = append(monkeys, thisMonkey)
 	return monkeys
 }
