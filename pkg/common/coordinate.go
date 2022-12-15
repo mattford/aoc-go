@@ -1,7 +1,6 @@
 package common
 
-type coordinate interface {
-}
+import "math"
 
 type Coordinate2 struct {
 	Y int
@@ -52,4 +51,8 @@ func MoveBy2(coord Coordinate2, move Coordinate2) Coordinate2 {
 		coord.Y + move.Y,
 		coord.X + move.X,
 	}
+}
+
+func Manhattan(coord Coordinate2, coord2 Coordinate2) int {
+	return int(math.Abs(float64(coord.Y-coord2.Y)) + math.Abs(float64(coord.X-coord2.X)))
 }
