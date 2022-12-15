@@ -120,3 +120,12 @@ func Bound(a int, low int, high int) int {
 	}
 	return a
 }
+
+func Pop(stack *[]any) any {
+	if len(*stack) == 0 {
+		return 0
+	}
+	item := (*stack)[len(*stack)-1]
+	*stack = (*stack)[:len(*stack)-1]
+	return item
+}
