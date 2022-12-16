@@ -25,7 +25,9 @@ func (p Day19) PartB(lines []string) any {
 	rules, messages := buildRules19(lines)
 	rules[8] = [][]any{{"42"}, {"42", "8"}}
 	rules[11] = [][]any{{"42", "31"}, {"42", "11", "31"}}
-	fmt.Println(buildRegex(11, rules))
+	for idx := range rules {
+		fmt.Println(idx, "^"+buildRegex(idx, rules)+"$")
+	}
 	expr := regexp.MustCompile("^" + buildRegex(0, rules) + "$")
 	total := 0
 	for _, message := range messages {
@@ -39,10 +41,9 @@ func (p Day19) PartB(lines []string) any {
 func buildRegex(idx int, rules map[int][][]any) string {
 	rule := rules[idx]
 	groups := make(map[int][]string)
-	repeatingGroup := 100
-	repeatingWithinGroup := 100
+	possibles := make([]string, 0)
 	for id, group := range rule {
-		for xxx, ruleIdx := range group {
+		for _, ruleIdx := range group {
 			rIdx, err := strconv.Atoi(ruleIdx.(string))
 			if err == nil {
 				if _, ok := groups[id]; !ok {
@@ -51,8 +52,7 @@ func buildRegex(idx int, rules map[int][][]any) string {
 				if rIdx != idx {
 					groups[id] = append(groups[id], buildRegex(rIdx, rules))
 				} else {
-					repeatingGroup = id
-					repeatingWithinGroup = xxx
+					groups[id][len(groups[id])-1] += "+"
 				}
 			} else {
 				str, _ := ruleIdx.(string)
@@ -60,19 +60,11 @@ func buildRegex(idx int, rules map[int][][]any) string {
 			}
 		}
 	}
-	possibles := make([]string, 0)
-	for gid, group := range groups {
-		thisOne := ""
-		for sid, str := range group {
-			if sid == repeatingWithinGroup && gid == repeatingGroup {
-				str = "(" + str + ")+"
-			}
-			thisOne += str
-		}
-		possibles = append(possibles, thisOne)
+
+	if len(possibles) > 1 {
+		return "(" + strings.Join(possibles, "|") + ")"
 	}
-	pattern := "(" + strings.Join(possibles, "|") + ")"
-	return pattern
+	return strings.Join(possibles, "|")
 }
 
 func buildRules19(lines []string) (map[int][][]any, []string) {
