@@ -56,3 +56,18 @@ func MoveBy2(coord Coordinate2, move Coordinate2) Coordinate2 {
 func Manhattan(coord Coordinate2, coord2 Coordinate2) int {
 	return int(math.Abs(float64(coord.Y-coord2.Y)) + math.Abs(float64(coord.X-coord2.X)))
 }
+
+func Bounds(rock []Coordinate2) (int, int, int, int) {
+	var minX, minY, maxX, maxY int
+	minX = math.MaxInt
+	minY = math.MaxInt
+	maxY = math.MinInt
+	maxX = math.MinInt
+	for _, point := range rock {
+		minX = int(math.Min(float64(point.X), float64(minX)))
+		minY = int(math.Min(float64(point.Y), float64(minY)))
+		maxX = int(math.Max(float64(point.X), float64(maxX)))
+		maxY = int(math.Max(float64(point.Y), float64(maxY)))
+	}
+	return minX, maxX, minY, maxY
+}
