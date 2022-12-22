@@ -27,14 +27,14 @@ func MaxInt(numbers []int) int {
 	return max
 }
 
-func Without(ints []int, target int) []int {
-	newInts := make([]int, 0, len(ints)-1)
-	for _, i := range ints {
-		if i != target {
-			newInts = append(newInts, i)
+func Without[T comparable](haystack []T, needle T) []T {
+	out := make([]T, 0, len(haystack)-1)
+	for _, i := range haystack {
+		if i != needle {
+			out = append(out, i)
 		}
 	}
-	return newInts
+	return out
 }
 
 func Unique[T comparable](a []T) []T {

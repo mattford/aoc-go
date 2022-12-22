@@ -17,12 +17,31 @@ type valve struct {
 
 func (p Day16) PartA(lines []string) any {
 	valveMap := parseInput16(lines)
-	return findBestRoute(valveMap, "AA", 0, 0)
+	routes := findBestRoutes(valveMap, "AA", 0, route{score: 0, valvesOpened: make([]string, 0)})
+	return routes[0].score
 }
 
 func (p Day16) PartB(lines []string) any {
 	valveMap := parseInput16(lines)
-	return findBestRouteWithElephant(valveMap, "AA", "AA", 0, 4, 4)
+	routes := findBestRoutes(valveMap, "AA", 4, route{score: 0, valvesOpened: make([]string, 0)})
+	best := 0
+	for _, myRoute := range routes {
+		for _, elephantRoute := range routes {
+			if myRoute.score+elephantRoute.score > best && !routesMatch(myRoute.valvesOpened, elephantRoute.valvesOpened) {
+				best = myRoute.score + elephantRoute.score
+			}
+		}
+	}
+	return best
+}
+
+func routesMatch(a, b []string) bool {
+	for _, i := range a {
+		if common.Contains(b, i) {
+			return true
+		}
+	}
+	return false
 }
 
 func parseInput16(lines []string) map[string]valve {
@@ -93,58 +112,39 @@ func navigateTunnels(valveMap map[string]valve, from string, to string) int {
 	return 0
 }
 
-func findBestRouteWithElephant(valveMap map[string]valve, pos string, elephantPos string, score int, turn int, elephantTurn int) int {
-	thisValve := valveMap[pos]
-	elephantValve := valveMap[elephantPos]
-	nextMap := removeKey(valveMap, pos)
-	nextMap = removeKey(nextMap, elephantPos)
-	best := score
-	for i := range nextMap {
-		for i2 := range removeKey(nextMap, i) {
-			thatValve := nextMap[i]
-			thatElephantValve := nextMap[i2]
-			thisScore := score
-			nextMeTurn := turn + thisValve.neighbours[i]
-			nextElephantTurn := elephantTurn + elephantValve.neighbours[i2]
-			if nextMeTurn < 30 {
-				thisScore += thatValve.flowRate * (30 - (turn + thisValve.neighbours[i]))
-			}
-			if nextElephantTurn < 30 {
-				thisScore += thatElephantValve.flowRate * (30 - (elephantTurn + elephantValve.neighbours[i2]))
-			}
-			if nextMeTurn >= 30 && nextElephantTurn >= 30 {
-				continue
-			}
-			if len(nextMap) > 1 {
-				thisScore = findBestRouteWithElephant(nextMap, i, i2, thisScore, turn+thisValve.neighbours[i], elephantTurn+elephantValve.neighbours[i2])
-			}
-			if thisScore > best {
-				best = thisScore
-			}
-		}
-	}
-	return best
+type route struct {
+	valvesOpened []string
+	score        int
 }
 
-func findBestRoute(valveMap map[string]valve, pos string, score int, turn int) int {
+func findBestRoutes(valveMap map[string]valve, pos string, turn int, soFar route) []route {
+	routes := make([]route, 0)
 	thisValve := valveMap[pos]
 	nextMap := removeKey(valveMap, pos)
-	best := score
 	for i := range nextMap {
 		thatValve := nextMap[i]
 		if turn+thisValve.neighbours[i] >= 30 {
 			continue
 		}
-		thisScore := score
+		thisScore := soFar.score
 		thisScore += thatValve.flowRate * (30 - (turn + thisValve.neighbours[i]))
+		thisValvesOpened := make([]string, len(soFar.valvesOpened))
+		copy(thisValvesOpened, soFar.valvesOpened)
+		thisValvesOpened = append(thisValvesOpened, i)
+		thisRoute := route{
+			score:        thisScore,
+			valvesOpened: thisValvesOpened,
+		}
 		if len(nextMap) > 1 {
-			thisScore = findBestRoute(nextMap, i, thisScore, turn+thisValve.neighbours[i])
+			thisRoutes := findBestRoutes(nextMap, i, turn+thisValve.neighbours[i], thisRoute)
+			routes = append(routes, thisRoutes...)
 		}
-		if thisScore > best {
-			best = thisScore
-		}
+		routes = append(routes, thisRoute)
 	}
-	return best
+	sort.Slice(routes, func(i, j int) bool {
+		return routes[i].score > routes[j].score
+	})
+	return routes
 }
 
 func removeKey(m map[string]valve, k string) map[string]valve {
