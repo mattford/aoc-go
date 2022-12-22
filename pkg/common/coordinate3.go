@@ -6,6 +6,15 @@ type Coordinate3 struct {
 	Z int
 }
 
+var Coordinate3Neighbours6 = []Coordinate3{
+	{X: 1, Y: 0, Z: 0},  // north
+	{X: 0, Y: 1, Z: 0},  // south
+	{X: -1, Y: 0, Z: 0}, // west
+	{X: 0, Y: -1, Z: 0}, // east
+	{X: 0, Y: 0, Z: 1},  // Forward
+	{X: 0, Y: 0, Z: -1}, // Back
+}
+
 var Coordinate3Neighbours26 = []Coordinate3{
 	{X: 1, Y: 0, Z: 0},    // north
 	{X: 0, Y: 1, Z: 0},    // south

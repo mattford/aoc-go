@@ -17,6 +17,16 @@ func GetInts(lines []string) []int {
 	return ints
 }
 
+func MinInt(numbers []int) int {
+	min := 0
+	for _, n := range numbers {
+		if n < min {
+			min = n
+		}
+	}
+	return min
+}
+
 func MaxInt(numbers []int) int {
 	max := 0
 	for _, n := range numbers {
