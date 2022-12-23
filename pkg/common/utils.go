@@ -84,6 +84,30 @@ func Remove[T comparable](haystack []T, needle T) []T {
 	return newArr
 }
 
+func RemoveIndex[T comparable](haystack []T, needle int) []T {
+	newArr := make([]T, 0, len(haystack)-1)
+	for k, v := range haystack {
+		if k != needle {
+			newArr = append(newArr, v)
+		}
+	}
+	return newArr
+}
+
+func InsertAtIndex[T comparable](haystack []T, needle int, item T) []T {
+	newArr := make([]T, 0, len(haystack)+1)
+	for k, v := range haystack {
+		if k == needle {
+			newArr = append(newArr, item)
+		}
+		newArr = append(newArr, v)
+	}
+	if needle >= len(haystack) {
+		newArr = append(newArr, item)
+	}
+	return newArr
+}
+
 func Column(haystack [][]int, idx int) []int {
 	out := make([]int, 0, len(haystack))
 	for _, v := range haystack {
@@ -138,4 +162,12 @@ func Pop(stack *[]any) any {
 	item := (*stack)[len(*stack)-1]
 	*stack = (*stack)[:len(*stack)-1]
 	return item
+}
+
+func CopyMap[T string, V any](m map[T]V) map[T]V {
+	newMap := make(map[T]V)
+	for k, v := range m {
+		newMap[k] = v
+	}
+	return newMap
 }
