@@ -16,7 +16,7 @@ type encryptedNode struct {
 }
 
 func (node encryptedNode) String() string {
-	return fmt.Sprintf("%v", node.value)
+	return fmt.Sprintf("%v/%v", node.value, node.order)
 }
 
 func (p Day20) PartA(lines []string) any {
@@ -30,23 +30,22 @@ func (p Day20) PartA(lines []string) any {
 }
 
 func (p Day20) PartB(lines []string) any {
-	//return 0
 	nodes := getNodesFromInput(lines, 811589153)
-	for round := 1; round <= 1; round++ {
-		for idx := 0; idx >= 0; idx = firstUnmixed(nodes, round) {
+	for round := 1; round <= 10; round++ {
+		for idx := firstUnmixed(nodes, round); idx >= 0; idx = firstUnmixed(nodes, round) {
 			nodes = moveNode(nodes, idx)
-			fmt.Println(nodes)
 		}
-
 	}
 	zeroIdx := findZero(nodes)
-	fmt.Println(zeroIdx)
-	return nodes[(zeroIdx+1000)%len(nodes)].value + nodes[(zeroIdx+2000)%len(nodes)].value + nodes[(zeroIdx+3000)%len(nodes)].value
+	length := len(nodes)
+	return nodes[(zeroIdx+1000)%length].value +
+		nodes[(zeroIdx+2000)%length].value +
+		nodes[(zeroIdx+3000)%length].value
 }
 
 func findZero(nodes []encryptedNode) int {
 	for k, n := range nodes {
-		if n.value == 0 {
+		if n.originalValue == 0 {
 			return k
 		}
 	}
@@ -58,17 +57,14 @@ func moveNode(nodes []encryptedNode, idx int) []encryptedNode {
 	nodeToMove.mixed++
 	length := len(nodes) - 1
 	steps := nodeToMove.value
-	newIdx := idx + steps
-	newIdx %= length
-	if newIdx < 0 {
-		newIdx = len(nodes) + newIdx
+	if steps == 0 {
+		nodes[idx].mixed++
+		return nodes
 	}
-
-	//newIdx := (idx + steps) % length
-	//if newIdx < 0 {
-	//	newIdx += length
-	//}
-	fmt.Println(idx, newIdx, nodeToMove)
+	newIdx := (idx + steps) % length
+	if newIdx < 0 {
+		newIdx += length
+	}
 	newNodes := common.RemoveIndex(nodes, idx)
 	return common.InsertAtIndex(newNodes, newIdx, nodeToMove)
 }
@@ -87,7 +83,7 @@ func firstUnmixed(nodes []encryptedNode, round int) int {
 
 func getNodesFromInput(lines []string, key int) []encryptedNode {
 	ints := common.GetInts(lines)
-	out := make([]encryptedNode, 0, len(ints))
+	out := make([]encryptedNode, 0)
 	for k, i := range ints {
 		out = append(out, encryptedNode{mixed: 0, value: i * key, originalValue: i, order: k})
 	}

@@ -96,15 +96,9 @@ func RemoveIndex[T comparable](haystack []T, needle int) []T {
 
 func InsertAtIndex[T comparable](haystack []T, needle int, item T) []T {
 	newArr := make([]T, 0, len(haystack)+1)
-	for k, v := range haystack {
-		if k == needle {
-			newArr = append(newArr, item)
-		}
-		newArr = append(newArr, v)
-	}
-	if needle >= len(haystack) {
-		newArr = append(newArr, item)
-	}
+	newArr = append(newArr, haystack[0:needle]...)
+	newArr = append(newArr, item)
+	newArr = append(newArr, haystack[needle:]...)
 	return newArr
 }
 
