@@ -381,3 +381,37 @@ func Benchmark2022Day22(b *testing.B) {
 		}
 	})
 }
+func Benchmark2022Day23(b *testing.B) {
+	Init()
+	input := aoc.TestInput(2022, 23)
+	p := aoc.NewPuzzle(2022, 23)
+	b.Run("PartA", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			p.PartA(input)
+		}
+	})
+	b.Run("PartB", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			p.PartB(input)
+		}
+	})
+}
+func Benchmark2022Day24(b *testing.B) {
+	Init()
+	input := aoc.TestInput(2022, 24)
+	p := aoc.NewPuzzle(2022, 24)
+	b.Run("PartA", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			p.PartA(input)
+		}
+	})
+	b.Run("PartB", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			p.PartB(input)
+		}
+	})
+}
