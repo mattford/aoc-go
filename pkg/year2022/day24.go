@@ -10,95 +10,77 @@ import (
 type Day24 struct{}
 
 type state24 struct {
-	grid      map[common.Coordinate2]int
-	blizzards map[common.Coordinate2][]rune
-	pos       common.Coordinate2
-	cost      int
+	pos  common.Coordinate2
+	cost int
 }
 
-func (s state24) hash() string {
-	blizMap := ""
-	for c, b := range s.blizzards {
-		blizMap += fmt.Sprintf("%v,%v:%v/", c.Y, c.X, string(b))
-	}
-	return fmt.Sprintf("%v,%v,%v", s.pos.Y, s.pos.X, blizMap)
+func (s state24) hash(length int) string {
+	return fmt.Sprintf("%v,%v,%v,%v", s.pos.Y, s.pos.X, s.cost, s.cost%length)
 }
 
 func (p Day24) PartA(lines []string) any {
-	s, target := parseInput24(lines)
-	return findShortest(s, target)
+	s, target, grid, blizzards := parseInput24(lines)
+	return findShortest(s, target, grid, blizzards)
 }
 
 func (p Day24) PartB(lines []string) any {
-	return "implement_me"
+	s, target, grid, blizzards := parseInput24(lines)
+	initialPos := s.pos
+	there := findShortest(s, target, grid, blizzards)
+	back := findShortest(state24{pos: target, cost: there}, initialPos, grid, blizzards)
+	return findShortest(state24{pos: initialPos, cost: back}, target, grid, blizzards)
 }
 
-func findShortest(initial state24, target common.Coordinate2) int {
+func findShortest(initial state24, target common.Coordinate2, grid map[common.Coordinate2]int, blizzards [][]common.Coordinate2) int {
 	queue := []state24{
 		initial,
 	}
+	blizLength := len(blizzards)
 	v := make([]string, 0)
 	for len(queue) > 0 {
 		s := queue[0]
 		queue = queue[1:]
-		if common.Contains(v, s.hash()) {
+		if common.Contains(v, s.hash(blizLength)) {
 			continue
 		}
-		s.progressBlizzards()
+		v = append(v, s.hash(blizLength))
+		bliz := blizzards[(s.cost+1)%len(blizzards)]
 		for _, neighbour := range common.Coordinate2Neighbours4 {
 			other := common.MoveBy2(s.pos, neighbour)
-			if _, ok := s.grid[other]; ok {
-				if _, ok2 := s.blizzards[other]; !ok2 {
-					nextState := state24{
-						blizzards: s.blizzards,
-						cost:      s.cost + 1,
-						grid:      s.grid,
-						pos:       other,
-					}
-					if other == target {
-						return s.cost
-					}
-					if !common.Contains(v, nextState.hash()) {
-						queue = append(queue, nextState)
-					}
+			if _, ok := grid[other]; ok && !common.Contains(bliz, other) {
+				nextState := state24{
+					cost: s.cost + 1,
+					pos:  other,
 				}
+				if other == target {
+					return s.cost + 1
+				}
+				queue = append(queue, nextState)
 			}
 		}
-		queue = append(queue, state24{
-			blizzards: s.blizzards,
-			cost:      s.cost + 1,
-			grid:      s.grid,
-			pos:       s.pos,
-		})
+		if !common.Contains(bliz, s.pos) {
+			queue = append(queue, state24{
+				cost: s.cost + 1,
+				pos:  s.pos,
+			})
+		}
 
 		sort.Slice(queue, func(i, j int) bool {
 			a := queue[i]
 			b := queue[j]
-			costDiff := a.cost - b.cost
-			if costDiff == 0 {
-				return common.Manhattan(a.pos, target) < common.Manhattan(b.pos, target)
-			}
-			return costDiff > 0
+			return a.cost < b.cost
 		})
 	}
 	return 0
 }
 
-func (s state24) printBliz() {
-	for c, b := range s.blizzards {
-		fmt.Println(c.Y, c.X, string(b))
-	}
-}
-
-func (s *state24) progressBlizzards() {
-	minX, maxX, minY, maxY := common.Bounds(common.Keys(s.grid))
-	minX++
-	maxX--
+func progressBlizzards(grid map[common.Coordinate2]int, blizzards map[common.Coordinate2][]rune) map[common.Coordinate2][]rune {
+	minX, maxX, minY, maxY := common.Bounds(common.Keys(grid))
 	minY++
 	maxY--
 	newBlizzards := make(map[common.Coordinate2][]rune)
-	for pos, blizzards := range s.blizzards {
-		for _, d := range blizzards {
+	for pos, bliz := range blizzards {
+		for _, d := range bliz {
 			var nextPos common.Coordinate2
 			switch d {
 			case '>':
@@ -123,13 +105,15 @@ func (s *state24) progressBlizzards() {
 			newBlizzards[nextPos] = append(newBlizzards[nextPos], d)
 		}
 	}
-	s.blizzards = newBlizzards
+	return newBlizzards
 }
 
-func parseInput24(lines []string) (state24, common.Coordinate2) {
+func parseInput24(lines []string) (state24, common.Coordinate2, map[common.Coordinate2]int, [][]common.Coordinate2) {
 	var pos, target common.Coordinate2
 	grid := make(map[common.Coordinate2]int)
-	blizzards := make(map[common.Coordinate2][]rune)
+	initialBlizzards := make(map[common.Coordinate2][]rune)
+	height := len(lines) - 2
+	width := len(lines[1]) - 2
 	for y, line := range lines {
 		chars := strings.Split(line, "")
 		for x, char := range chars {
@@ -137,7 +121,7 @@ func parseInput24(lines []string) (state24, common.Coordinate2) {
 			if char != "#" {
 				grid[coord] = 1
 				if char != "." {
-					blizzards[coord] = append(blizzards[coord], rune(char[0]))
+					initialBlizzards[coord] = append(initialBlizzards[coord], rune(char[0]))
 				}
 			}
 			if y == 0 && char == "." {
@@ -147,5 +131,12 @@ func parseInput24(lines []string) (state24, common.Coordinate2) {
 			}
 		}
 	}
-	return state24{pos: pos, grid: grid, blizzards: blizzards}, target
+	lcm := common.LCM(height, width)
+	blizzards := make([][]common.Coordinate2, lcm)
+	for i := 0; i < lcm; i++ {
+		blizzards[i] = common.Keys(initialBlizzards)
+		initialBlizzards = progressBlizzards(grid, initialBlizzards)
+	}
+
+	return state24{pos: pos}, target, grid, blizzards
 }
