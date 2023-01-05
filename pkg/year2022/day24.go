@@ -68,7 +68,7 @@ func findShortest(initial state24, target common.Coordinate2, grid map[common.Co
 		sort.Slice(queue, func(i, j int) bool {
 			a := queue[i]
 			b := queue[j]
-			return a.cost < b.cost
+			return a.cost + common.Manhattan(a.pos, target) < b.cost + common.Manhattan(b.pos, target)
 		})
 	}
 	return 0
